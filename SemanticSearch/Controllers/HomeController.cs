@@ -1,25 +1,83 @@
 using Microsoft.AspNetCore.Mvc;
 using SemanticSearch.Models;
-using System.Diagnostics;
+using System.Net.Http.Json;
+using System.Text.Json;
 
-namespace SemanticSearch.Controllers
+namespace SemanticSearch.Mvc.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly HttpClient _httpClient;
+        private readonly string _pythonApiUrl = "http://127.0.0.1:8080/program/execute";
+
+        public HomeController(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
+        [HttpGet]
         public IActionResult Index()
         {
-            return View();
+            var model = new SearchViewModel();
+            return View(model);
         }
 
-        public IActionResult Privacy()
+        [HttpPost]
+        public async Task<IActionResult> Index(SearchViewModel model)
         {
-            return View();
-        }
+            if (string.IsNullOrEmpty(model.Query))
+            {
+                return View(model);
+            }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            try
+            {
+                var request = new { query = model.Query };
+                var response = await _httpClient.PostAsJsonAsync(_pythonApiUrl, request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<SemanticSearchApiResponse>(responseBody);
+
+                    model.AiResponse = apiResponse?.Answer ?? "Пусто";
+                    model.IsSearched = true;
+
+                    if (apiResponse?.FoundFunctions != null && apiResponse.FoundFunctions.Count > 0)
+                    {
+                        model.ExecutedFunctions = apiResponse.FoundFunctions
+                            .Select(f => new ExecutedFunction
+                            {
+                                Name = f.Name,
+                                Params = f.Params ?? new Dictionary<string, object>()
+                            })
+                            .ToList();
+                    }
+                }
+                else
+                {
+                    model.AiResponse = $"Помилка API: {response.StatusCode}";
+                    model.IsSearched = true;
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                model.AiResponse = $"Не вдалося підключитися до сервера: {ex.Message}";
+                model.IsSearched = true;
+            }
+            catch (JsonException ex)
+            {
+                model.AiResponse = $"Помилка парсингу JSON: {ex.Message}";
+                model.IsSearched = true;
+            }
+            catch (Exception ex)
+            {
+                model.AiResponse = $"Помилка: {ex.Message}";
+                model.IsSearched = true;
+            }
+
+            return View(model);
         }
     }
+
 }

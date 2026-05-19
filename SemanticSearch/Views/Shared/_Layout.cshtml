@@ -3,45 +3,76 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SemanticSearch</title>
+    <title>@ViewData["Title"] - SemanticSearch.Mvc</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SemanticSearch.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SemanticSearch.Mvc.styles.css" asp-append-version="true" />
 </head>
-<body>
+
+<!-- ЗМІНЕНО: Додано класи, які змушують body стати на весь екран -->
+<body class="d-flex flex-column min-vh-100">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SemanticSearch</a>
+        <!-- Клас mb-4 змінено на mb-0, щоб прибрати білий зазор між шапкою та градієнтом чату -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom box-shadow mb-0 py-3">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand d-flex align-items-center fw-bold text-gradient" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-cpu-fill me-2 text-info"></i>
+                    <span>Semantic Search</span>
+                </a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between align-items-center">
+                    <!-- Посилання навігації (ліворуч) -->
+                    <ul class="navbar-nav mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-white-50" asp-area="" asp-controller="Home" asp-action="Index">Головна</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-white-50" asp-area="" asp-controller="Home" asp-action="Privacy">Конфіденційність</a>
                         </li>
                     </ul>
+
+                    <!-- Блок розробника (праворуч) -->
+                    <div class="d-flex align-items-center gap-3 mt-2 mt-lg-0">
+                        <div class="text-lg-end text-start">
+                            <span class="text-white-50 d-block small" style="font-size: 0.75rem;">Розробник</span>
+                            <span class="text-white fw-medium">Зябченко І. В.</span>
+                        </div>
+
+                        <div class="vr text-white-50 d-none d-lg-block" style="height: 30px;"></div>
+
+                        <div class="d-flex gap-1">
+                            <a href="https://github.com/Ziabaa" target="_blank" class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;" title="Мій GitHub">
+                                <i class="bi bi-github fs-5"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <!-- ЗМІНЕНО: container-fluid замість container, щоб чат гарно сідав по краях без білих рамок -->
+    <div class="container-fluid p-0 flex-grow-1 d-flex flex-column">
+        <main role="main" class="flex-grow-1 d-flex flex-column">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - SemanticSearch - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- ЗМІНЕНО: Клас mt-auto тепер відпрацює на 100% і притисне футер до низу -->
+    <footer class="border-top footer text-muted bg-light py-3 mt-auto">
+        <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
+            <span>&copy; 2026 - SemanticSearch.Mvc</span>
+            <a class="text-decoration-none text-muted" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

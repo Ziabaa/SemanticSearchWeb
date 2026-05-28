@@ -164,22 +164,32 @@
             const responseText = document.getElementById('aiResponseText');
             if (!responseText) return;
 
-            let html = responseText.innerText;
+            let text = responseText.innerText;
 
-            // Регулярное выражение для поиска URL и сайтов (не захватывает скобки в конце)
-            html = html.replace(
-                /(https?:\/\/[^\s)]+|www\.[^\s)]+)/g,
-                function(match) {
-                    let url = match;
-                    // Если URL заканчивается на ) или ., удаляем его
-                    if (url.endsWith(')') || url.endsWith('.')) {
-                        url = url.slice(0, -1);
-                    }
-                    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-info text-decoration-none fw-semibold" style="border-bottom: 1px dashed #0dcaf0;">${url}</a>`;
+            const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+
+            let html = text.replace(urlRegex, function(match) {
+                let url = match;
+                let trailingPunctuation = '';
+
+                const matchTrailing = url.match(/([.),;!]+)$/);
+                if (matchTrailing) {
+                    trailingPunctuation = matchTrailing[1];
+                    url = url.slice(0, -trailingPunctuation.length);
                 }
-            );
 
-            // Преобразуем текст в HTML с сохранением переносов строк
+                const hrefValue = url.startsWith('www.') ? `https://${url}` : url;
+
+                let displayUrl = url;
+                try {
+                    displayUrl = decodeURIComponent(url);
+                } catch (e) {
+                    console.error("Ошибка декодирования URL:", e);
+                }
+
+                return `<a href="${hrefValue}" target="_blank" rel="noopener noreferrer" class="text-info text-decoration-none fw-semibold" style="border-bottom: 1px dashed #0dcaf0; word-break: break-all;">${displayUrl}</a>${trailingPunctuation}`;
+            });
+
             html = html.replace(/\n/g, '<br>');
 
             responseText.innerHTML = html;
